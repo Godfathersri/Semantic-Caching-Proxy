@@ -4,8 +4,7 @@ from typing import Optional
 
 class GenerateRequest(BaseModel):
     prompt: str
-    model: str = "gpt-4o-mini"
-    temperature: float = 0.7
+    model: str = "gemini-2.5-flash"
 
 
 class GenerateResponse(BaseModel):
