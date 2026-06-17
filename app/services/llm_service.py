@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from openai import AsyncOpenAI
 
-from app.core.config import settings
+from app.config import settings
 
 
 if not settings.OPENAI_API_KEY:
@@ -15,7 +15,7 @@ client = AsyncOpenAI(
 )
 
 
-async def generate_response(
+async def generate_llm_response(
     prompt: str,
     model: str = "gpt-4o-mini",
     temperature: float = 0.7

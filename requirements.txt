@@ -2,6 +2,7 @@ fastapi
 uvicorn
 python-dotenv
 pydantic
-openai
+google-genai
 qdrant-client
 pandas
+pydantic-settings
