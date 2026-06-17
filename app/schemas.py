@@ -2,10 +2,14 @@ from pydantic import BaseModel
 from typing import Optional
 
 
-class GenerateRequest(BaseModel):
-    prompt: str
-    model: str
-    temperature: float = 0
+class GenerateResponse(BaseModel):
+    success: bool
+    response: str
+
+    cache_status: str
+    similarity_score: Optional[float] = None
+
+    latency_ms: float
 
 
 class GenerateResponse(BaseModel):
