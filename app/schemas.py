@@ -15,3 +15,4 @@ class GenerateResponse(BaseModel):
     similarity_score: Optional[float] = None
 
     latency_ms: float
+    embedding_generated: bool = False
