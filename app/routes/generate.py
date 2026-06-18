@@ -3,6 +3,7 @@ from fastapi import APIRouter , HTTPException
 
 from app.schemas import GenerateRequest , GenerateResponse
 from app.services.llm_service import generate_llm_response
+from app.services.embedding_service import generate_embedding
 
 
 router = APIRouter()
@@ -25,13 +26,20 @@ async def generate_response(request: GenerateRequest):
 
     latency_ms = round((time.time() - start_time) * 1000 , 2)
 
+
+    embedding = await generate_embedding(request.prompt)
+
+    print(f"Embedding generated successfully")
+    print(f"Embedding dimension:" , len(embedding))
+
     return GenerateResponse(
       success = True,
       response = llm_response,
       cache_status = "MISS",
       cached= False,
       similarity_score = None,
-      latency_ms = latency_ms
+      latency_ms = latency_ms,
+      embedding_generated= True
     )
   except ValueError as error:
     raise HTTPException(
