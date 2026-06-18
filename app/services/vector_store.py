@@ -86,4 +86,4 @@ def store_cache_item(
         points=[point]
     )
 
-vector_store = VectorStore()
+vectorstore = VectorStore()
