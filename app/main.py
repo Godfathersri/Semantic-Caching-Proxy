@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.routes import health , generate
+from app.services.vector_store import vectorstore
 
 
 
@@ -15,8 +16,8 @@ app.include_router(generate.router)
 
 @app.on_event("startup")
 async def startup_event():
-
-    vector_store.create_collection_if_not_exists()
+  # Call create on the imported vectorstore instance
+  vectorstore.create_collection_if_not_exists()
 
 
 

@@ -33,7 +33,7 @@ async def generate_embedding(text:str) -> list[float]:
             model=settings.Embedding_Model,
             contents=text,
             config={
-                "output_dimension": settings.Embedding_Dimension
+                "output_dimension": settings.EMBEDDING_DIMENSION
             }
         )
         embedding = response.embeddings[0].values
