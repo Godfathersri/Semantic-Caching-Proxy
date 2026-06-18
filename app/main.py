@@ -13,7 +13,10 @@ app = FastAPI(
 app.include_router(health.router)
 app.include_router(generate.router)
 
+@app.on_event("startup")
+async def startup_event():
 
+    vector_store.create_collection_if_not_exists()
 
 
 
