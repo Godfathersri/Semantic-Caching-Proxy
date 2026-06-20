@@ -88,4 +88,22 @@ class VectorStore:
             points=[point]
         )
 
+    def search_similar(
+    self,
+    embedding: list[float],
+    limit: int = 1
+    ):
+
+        results = self.client.search(
+            collection_name=self.collection_name,
+            query_vector=embedding,
+            limit=limit,
+            with_payload=True
+        )
+
+        if not results:
+            return None
+
+        return results[0]
+
 vectorstore = VectorStore()
