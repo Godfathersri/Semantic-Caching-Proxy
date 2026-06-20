@@ -33,8 +33,8 @@ async def generate_response(request: GenerateRequest):
 
     print ("Cache search completed. Result:" , cache_result)
 
-    if (cache_result and cache_result.get("score") is not None and cache_result["score"] >= settings.SIMILARITY_THRESHOLD):
-      payload = cache_result.get("payload" , {})
+    if (cache_result and cache_result.score is not None and cache_result.score >= settings.QDRANT_SIMILARITY_THRESHOLD):
+      payload = cache_result.payload or {}
 
       cached_response = payload.get("response")
 
@@ -46,7 +46,7 @@ async def generate_response(request: GenerateRequest):
           response = cached_response,
           cache_status = "HIT",
           cached= True,
-          similarity_score = cache_result["score"],
+          similarity_score = cache_result.score,
           latency_ms = latency_ms,
           embedding_generated= True
         )
