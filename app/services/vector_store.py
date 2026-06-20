@@ -2,7 +2,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
     VectorParams,
-    PointStruct
+    PointStruct,
 )
 from uuid import uuid4
 from datetime import datetime
@@ -94,16 +94,16 @@ class VectorStore:
     limit: int = 1
     ):
 
-        results = self.client.search(
+        results = self.client.query_points(
             collection_name=self.collection_name,
-            query_vector=embedding,
+            query=embedding,
             limit=limit,
             with_payload=True
         )
 
-        if not results:
+        if not results.points:
             return None
 
-        return results[0]
+        return results.points[0]
 
 vectorstore = VectorStore()
