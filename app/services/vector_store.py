@@ -10,6 +10,7 @@ from datetime import datetime
 from app.config import settings
 
 
+
 class VectorStore:
 
     def __init__(self):
@@ -66,7 +67,8 @@ def store_cache_item(
     prompt: str,
     response: str,
     embedding: list[float],
-    model: str
+    model: str,
+    chache_status: str
 ) -> None:
 
     point = PointStruct(

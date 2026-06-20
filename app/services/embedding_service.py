@@ -4,6 +4,7 @@ from google import genai
 from app.config import settings
 
 
+
 if not settings.GEMINI_API_KEY:
     raise RuntimeError("GEMINI_API_KEY is not set in the environment variables.")
 
@@ -33,7 +34,7 @@ async def generate_embedding(text:str) -> list[float]:
             model=settings.Embedding_Model,
             contents=text,
             config={
-                "output_dimension": settings.EMBEDDING_DIMENSION
+                "output_dimensionality": settings.EMBEDDING_DIMENSION
             }
         )
         embedding = response.embeddings[0].values
