@@ -5,6 +5,7 @@ from app.schemas import GenerateRequest , GenerateResponse
 from app.services.llm_service import generate_llm_response
 from app.services.embedding_service import generate_embedding
 from app.services.vector_store import  vectorstore
+from app.config import settings
 
 
 router = APIRouter()
@@ -20,18 +21,39 @@ async def generate_response(request: GenerateRequest):
     )
   
   try:
-    llm_response = await generate_llm_response(
-      prompt= request.prompt,
-      model = request.model
-    )
-
-    latency_ms = round((time.time() - start_time) * 1000 , 2)
-
 
     embedding = await generate_embedding(request.prompt)
 
     print(f"Embedding generated successfully")
     print(f"Embedding dimension:" , len(embedding))
+
+    cache_result = vectorstore.search_similar(
+      embedding = embedding
+    )
+
+    print ("Cache search completed. Result:" , cache_result)
+
+    if (cache_result and cache_result.get("score") is not None and cache_result["score"] >= settings.SIMILARITY_THRESHOLD):
+      payload = cache_result.get("payload" , {})
+
+      cached_response = payload.get("response")
+
+      if cached_response:
+        latency_ms = round((time.time() - start_time) * 1000 , 2)
+
+        return GenerateResponse(
+          success = True,
+          response = cached_response,
+          cache_status = "HIT",
+          cached= True,
+          similarity_score = cache_result["score"],
+          latency_ms = latency_ms,
+          embedding_generated= True
+        )
+    llm_response = await generate_llm_response(
+      prompt= request.prompt,
+      model = request.model
+    )
 
     vectorstore.store_cache_item(
       prompt = request.prompt,
@@ -42,6 +64,8 @@ async def generate_response(request: GenerateRequest):
     )
 
     print("stored item sucessfully")
+
+    latency_ms = round((time.time() - start_time) * 1000 , 2)
 
     return GenerateResponse(
       success = True,
