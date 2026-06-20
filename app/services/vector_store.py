@@ -62,30 +62,30 @@ class VectorStore:
                 f"{self.collection_name}"
             )
 
-def store_cache_item(
-    self,
-    prompt: str,
-    response: str,
-    embedding: list[float],
-    model: str,
-    chache_status: str
-) -> None:
+    def store_cache_item(
+        self,
+        prompt: str,
+        response: str,
+        embedding: list[float],
+        model: str,
+        cache_status: str
+    ) -> None:
 
-    point = PointStruct(
-        id=str(uuid4()),
-        vector=embedding,
-        payload={
-            "prompt": prompt,
-            "response": response,
-            "model": model,
-            "created_at": datetime.utcnow().isoformat(),
-            "cache_hits": 0
-        }
-    )
+        point = PointStruct(
+            id=str(uuid4()),
+            vector=embedding,
+            payload={
+                "prompt": prompt,
+                "response": response,
+                "model": model,
+                "created_at": datetime.utcnow().isoformat(),
+                "cache_hits": 0
+            }
+        )
 
-    self.client.upsert(
-        collection_name=self.collection_name,
-        points=[point]
-    )
+        self.client.upsert(
+            collection_name=self.collection_name,
+            points=[point]
+        )
 
 vectorstore = VectorStore()
