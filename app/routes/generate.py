@@ -4,6 +4,7 @@ from fastapi import APIRouter , HTTPException
 from app.schemas import GenerateRequest , GenerateResponse
 from app.services.llm_service import generate_llm_response
 from app.services.embedding_service import generate_embedding
+from app.services.vector_store import VectorStore
 
 
 router = APIRouter()
@@ -31,6 +32,16 @@ async def generate_response(request: GenerateRequest):
 
     print(f"Embedding generated successfully")
     print(f"Embedding dimension:" , len(embedding))
+
+    VectorStore.store_cache_item(
+      prompt = request.prompt,
+      response = llm_response,
+      embedding = embedding,
+      model = request.model
+      chache_status = "MISS"
+    )
+
+    print("stored item sucessfully")
 
     return GenerateResponse(
       success = True,
