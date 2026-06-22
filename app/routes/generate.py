@@ -70,6 +70,7 @@ async def generate_response(request: GenerateRequest):
                             cached=True,
                             similarity_score=cache_result.score,
                             latency_ms=latency_ms,
+                            matched_prompt=payload.get("prompt"),
                             embedding_generated=True
                         )
             else:
@@ -104,6 +105,7 @@ async def generate_response(request: GenerateRequest):
             cached=False,
             similarity_score=None,
             latency_ms=latency_ms,
+            matched_prompt=None,
             embedding_generated=True
         )
 

@@ -147,5 +147,18 @@ class VectorStore:
             collection_name=self.collection_name
         )
 
+    def get_recent_items(
+        self,
+        limit: int = 10
+    ):
+
+        results, _ = self.client.scroll(
+            collection_name=self.collection_name,
+            limit=limit,
+            with_payload=True,
+            with_vectors=False
+        )
+
+        return results
 
 vectorstore = VectorStore()

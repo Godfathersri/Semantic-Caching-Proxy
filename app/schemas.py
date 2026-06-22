@@ -5,7 +5,7 @@ from typing import Optional
 class GenerateRequest(BaseModel):
     prompt: str
     model: str = "gemini-2.5-flash"
-
+    temperature: float = 0.7
 
 class GenerateResponse(BaseModel):
     success: bool
