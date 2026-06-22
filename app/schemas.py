@@ -12,7 +12,10 @@ class GenerateResponse(BaseModel):
     response: str
 
     cache_status: str
+    cached: bool
+
     similarity_score: Optional[float] = None
+    matched_prompt: Optional[str] = None
 
     latency_ms: float
     embedding_generated: bool = False
