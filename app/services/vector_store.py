@@ -133,6 +133,19 @@ class VectorStore:
             return None
 
         return results.points[0]
+    
+    def get_total_cache_items(self) -> int:
+        results = self.client.count(
+            collection_name = self.collection_name,
+            exact=True
+        )
+
+        return results.count
+    
+    def get_collection_info(self):
+        return self.client.get_collection(
+            collection_name=self.collection_name
+        )
 
 
 vectorstore = VectorStore()
