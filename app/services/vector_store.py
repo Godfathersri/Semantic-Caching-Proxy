@@ -10,7 +10,6 @@ from datetime import datetime
 from app.config import settings
 
 
-
 class VectorStore:
 
     def __init__(self):
@@ -68,8 +67,11 @@ class VectorStore:
         response: str,
         embedding: list[float],
         model: str,
-        cache_status: str
+        cache_status: str,
+        temperature: float = 0.7
     ) -> None:
+
+        now = datetime.utcnow().isoformat()
 
         point = PointStruct(
             id=str(uuid4()),
@@ -78,7 +80,10 @@ class VectorStore:
                 "prompt": prompt,
                 "response": response,
                 "model": model,
-                "created_at": datetime.utcnow().isoformat(),
+                "temperature": temperature,
+                "cache_status": cache_status,
+                "created_at": now,
+                "last_accessed_at": now,
                 "cache_hits": 0
             }
         )
@@ -88,10 +93,33 @@ class VectorStore:
             points=[point]
         )
 
+    def update_cache_hit(
+        self,
+        point_id: str,
+        payload: dict
+    ) -> None:
+
+        updated_payload = {
+            **payload,
+            "cache_hits": payload.get(
+                "cache_hits",
+                0
+            ) + 1,
+            "cache_status": "HIT",
+            "last_accessed_at":
+                datetime.utcnow().isoformat()
+        }
+
+        self.client.set_payload(
+            collection_name=self.collection_name,
+            payload=updated_payload,
+            points=[point_id]
+        )
+
     def search_similar(
-    self,
-    embedding: list[float],
-    limit: int = 1
+        self,
+        embedding: list[float],
+        limit: int = 1
     ):
 
         results = self.client.query_points(
@@ -105,5 +133,6 @@ class VectorStore:
             return None
 
         return results.points[0]
+
 
 vectorstore = VectorStore()
