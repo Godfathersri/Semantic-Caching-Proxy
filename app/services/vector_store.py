@@ -147,6 +147,13 @@ class VectorStore:
             collection_name=self.collection_name
         )
 
+        return results.count
+    
+    def get_collection_info(self):
+        return self.client.get_collection(
+            collection_name=self.collection_name
+        )
+
     def get_recent_items(
         self,
         limit: int = 10

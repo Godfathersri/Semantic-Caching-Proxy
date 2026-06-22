@@ -70,7 +70,6 @@ async def generate_response(request: GenerateRequest):
                             cached=True,
                             similarity_score=cache_result.score,
                             latency_ms=latency_ms,
-                            matched_prompt=payload.get("prompt"),
                             embedding_generated=True
                         )
             else:
