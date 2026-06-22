@@ -147,13 +147,6 @@ class VectorStore:
             collection_name=self.collection_name
         )
 
-        return results.count
-    
-    def get_collection_info(self):
-        return self.client.get_collection(
-            collection_name=self.collection_name
-        )
-
     def get_recent_items(
         self,
         limit: int = 10
@@ -167,12 +160,5 @@ class VectorStore:
         )
 
         return results
-    
-    def check_qdrant_connection(self) -> bool:
-        try:
-            self.client.get_collections()
-            return True
-        except Exception as e:
-            print(f"Error connecting to Qdrant: {str(e)}")
 
 vectorstore = VectorStore()
