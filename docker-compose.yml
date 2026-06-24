@@ -7,6 +7,9 @@ services:
     volumes:
       - ./app:/code/app
 
+    env_file:
+      - .env
+
     environment:
       QDRANT_HOST: qdrant
 

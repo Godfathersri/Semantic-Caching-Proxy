@@ -160,5 +160,12 @@ class VectorStore:
         )
 
         return results
+    
+    def check_qdrant_connection(self) -> bool:
+        try:
+            self.client.get_collections()
+            return True
+        except Exception as e:
+            print(f"Error connecting to Qdrant: {str(e)}")
 
 vectorstore = VectorStore()
