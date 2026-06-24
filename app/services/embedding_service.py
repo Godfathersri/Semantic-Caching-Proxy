@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from google import genai
-
+from app.logger import logger
 from app.config import settings
 from app.exceptions import EmbeddingError
 
@@ -30,7 +30,7 @@ async def generate_embedding(text:str) -> list[float]:
         )
     
     try:
-
+        logger.info("Generating embedding")
         response = client.models.embed_content(
             model=settings.Embedding_Model,
             contents=text,
@@ -41,17 +41,24 @@ async def generate_embedding(text:str) -> list[float]:
         embedding = response.embeddings[0].values
 
         if not embedding:
+            logger.error(
+                "Embedding service returned empty embedding"
+            )
             raise HTTPException(
                 status_code=500,
                 detail="Failed to generate embedding"
             )
         
+        logger.info(
+            "Embedding generated successfully"
+        )
         return embedding
     
     except HTTPException:
         raise
     
     except Exception as e:
+        logger.error(f"Embedding generation failed: {str(e)}")
         raise EmbeddingError(
             f"Embedding generation failed: {str(e)}"
         )

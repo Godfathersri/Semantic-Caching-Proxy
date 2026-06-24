@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from google import genai
-
+from app.logger import logger
 from app.config import settings
 from app.exceptions import GeminiAPIError, GeminiUnavailableError
 
@@ -30,12 +30,18 @@ async def generate_llm_response(
         )
 
     try:
+        logger.info(
+            f"Calling Gemini | model={model}"
+        )
         response = client.models.generate_content(
             model=model,
             contents=prompt
         )
 
         if not response.text:
+            logger.error(
+                "Gemini returned empty response"
+            )
             raise HTTPException(
                 status_code=500,
                 detail="LLM returned an empty response"
@@ -54,8 +60,14 @@ async def generate_llm_response(
             or "UNAVAILABLE" in error_message
             or "RESOURCE_EXHAUSTED" in error_message
         ):
+            logger.error(
+                f"Gemini unavailable: {error_message}"
+            )
             raise GeminiUnavailableError(
                 "Gemini service is under heavy load"
             )
 
+        logger.error(
+            f"Gemini generation failed: {error_message}"
+        )
         raise GeminiAPIError(error_message)

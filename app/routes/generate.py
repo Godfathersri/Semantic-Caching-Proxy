@@ -36,18 +36,17 @@ async def generate_response(request: GenerateRequest):
     try:
         embedding = await generate_embedding(request.prompt)
 
-        print("Embedding generated successfully")
-        print("Embedding dimension:", len(embedding))
+        logger.info("Embedding generated successfully")
+        logger.info(f"Embedding dimension: {len(embedding)}")
 
         cache_result = vectorstore.search_similar(
             embedding=embedding
         )
 
-        print("Cache search completed. Result:", cache_result)
+        logger.info(f"Cache search completed. Result: {cache_result}")
 
         if cache_result:
-            print("Potential cache match found")
-            print("Similarity score:", cache_result.score)
+            logger.info(f"Potential cache match found | Similarity score: {cache_result.score}")
 
             if (
                 cache_result.score is not None
@@ -56,16 +55,14 @@ async def generate_response(request: GenerateRequest):
                 payload = cache_result.payload or {}
 
                 if not payload:
-                    print("Cache HIT candidate found, but payload is missing")
+                    logger.info("Cache HIT candidate found, but payload is missing")
                 else:
                     cached_response = payload.get("response")
 
                     if not cached_response:
-                        print("Cache HIT candidate found, but response is missing from payload")
+                        logger.info("Cache HIT candidate found, but response is missing from payload")
                     else:
-                        print("Cache HIT")
-                        print("Returning cached response")
-                        print("Gemini skipped")
+                        logger.info(f"Cache HIT | score={similarity_score:.2f}")
 
                         update_cache_hit(cache_result)
 
@@ -81,12 +78,9 @@ async def generate_response(request: GenerateRequest):
                             embedding_generated=True
                         )
             else:
-                print("Cache match below similarity threshold")
+                logger.info("Cache MISS | calling Gemini")
         else:
-            print("No cache match found")
-
-        print("Cache MISS")
-        print("Calling Gemini")
+            logger.info("Cache no found | calling Gemini")
 
         llm_response = await generate_llm_response(
             prompt=request.prompt,

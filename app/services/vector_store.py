@@ -7,7 +7,8 @@ from qdrant_client.models import (
 from uuid import uuid4
 from datetime import datetime
 from app.config import settings
-from app.exceptions import QdrantStorageError
+from app.exceptions import QdrantStorageError, QdrantSearchError
+from app.logger import logger
 
 class VectorStore:
 
@@ -48,14 +49,14 @@ class VectorStore:
                 )
             )
 
-            print(
+            logger.info(
                 f"Created collection: "
                 f"{self.collection_name}"
             )
 
         else:
 
-            print(
+            logger.info(
                 f"Collection already exists: "
                 f"{self.collection_name}"
             )

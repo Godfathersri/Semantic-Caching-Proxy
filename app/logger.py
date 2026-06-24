@@ -1,14 +1,26 @@
 import logging
+import sys
 
-logging.basicConfig(
-    level=logging.INFO,
-    format=(
-        "%(asctime)s - "
-        "%(levelname)s - "
-        "%(message)s"
+
+def setup_logger() -> logging.Logger:
+    logger = logging.getLogger("semantic_cache")
+
+    if logger.handlers:
+        return logger
+
+    logger.setLevel(logging.INFO)
+
+    handler = logging.StreamHandler(sys.stdout)
+
+    formatter = logging.Formatter(
+        "%(levelname)s | %(asctime)s | %(message)s"
     )
-)
 
-logger = logging.getLogger(
-    "semantic-cache"
-)
+    handler.setFormatter(formatter)
+
+    logger.addHandler(handler)
+
+    return logger
+
+
+logger = setup_logger()

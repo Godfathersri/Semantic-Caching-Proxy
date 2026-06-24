@@ -1,5 +1,6 @@
 from app.schemas import GenerateResponse
 from app.services.vector_store import vectorstore
+from app.logger import logger
 
 
 def build_cache_response(
@@ -36,6 +37,8 @@ def store_cache_entry(
     cache_status: str = "MISS"
 ) -> None:
 
+    logger.info(f"Storing cache entry | model={model}")
+
     vectorstore.store_cache_item(
         prompt=prompt,
         response=response,
@@ -49,6 +52,8 @@ def store_cache_entry(
 def update_cache_hit(
     cache_result
 ) -> None:
+
+     logger.info(f"Updating cache hit | id={cache_result.id}")
 
     payload = cache_result.payload or {}
 
