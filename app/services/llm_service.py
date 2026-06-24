@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from google import genai
 
 from app.config import settings
-
+from app.exceptions import GeminiAPIError, GeminiUnavailableError
 
 if not settings.GEMINI_API_KEY:
     raise RuntimeError(
@@ -30,7 +30,6 @@ async def generate_llm_response(
         )
 
     try:
-
         response = client.models.generate_content(
             model=model,
             contents=prompt
@@ -45,10 +44,18 @@ async def generate_llm_response(
         return response.text
 
     except HTTPException:
-        raise
+        raise 
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"LLM request failed: {str(e)}"
-        )
+
+        error_message = str(e)
+        if (
+            "503" in error_message
+            or "UNAVAILABLE" in error_message
+            or "RESOURCE_EXHAUSTED" in error_message
+        ):
+            raise GeminiUnavailableError(
+                "Gemini service is under heavy load"
+            )
+
+        raise GeminiAPIError(error_message)

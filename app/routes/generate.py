@@ -11,6 +11,13 @@ from app.services.cache_service import (
     update_cache_hit
 )
 from app.config import settings
+from app.exceptions import (
+    EmbeddingError,
+    QdrantSearchError,
+    QdrantStorageError,
+    GeminiUnavailableError,
+    GeminiAPIError
+)
 
 
 router = APIRouter()
@@ -109,14 +116,95 @@ async def generate_response(request: GenerateRequest):
             embedding_generated=True
         )
 
-    except ValueError as error:
+    except HTTPException:
+        raise
+
+    except EmbeddingError as error:
+
         raise HTTPException(
             status_code=500,
-            detail=str(error)
+            detail={
+                "success": False,
+                "error": {
+                    "code":
+                        "EMBEDDING_FAILED",
+                    "message":
+                        str(error)
+                }
+            }
+        )
+
+    except QdrantSearchError as error:
+
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error": {
+                    "code":
+                        "QDRANT_SEARCH_FAILED",
+                    "message":
+                        str(error)
+                }
+            }
+        )
+
+    except QdrantStorageError as error:
+
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error": {
+                    "code":
+                        "QDRANT_STORE_FAILED",
+                    "message":
+                        str(error)
+                }
+            }
+        )
+
+    except GeminiUnavailableError:
+
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "success": False,
+                "error": {
+                    "code":
+                        "GEMINI_UNAVAILABLE",
+                    "message":
+                        "LLM provider temporarily unavailable"
+                }
+            }
+        )
+
+    except GeminiAPIError as error:
+
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "success": False,
+                "error": {
+                    "code":
+                        "GEMINI_API_ERROR",
+                    "message":
+                        str(error)
+                }
+            }
         )
 
     except Exception as error:
+
         raise HTTPException(
             status_code=500,
-            detail=f"LLM API Failed: {str(error)}"
+            detail={
+                "success": False,
+                "error": {
+                    "code":
+                        "INTERNAL_SERVER_ERROR",
+                    "message":
+                        str(error)
+                }
+            }
         )

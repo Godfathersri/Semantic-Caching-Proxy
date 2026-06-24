@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from google import genai
 
 from app.config import settings
-
+from app.exceptions import EmbeddingError
 
 
 if not settings.GEMINI_API_KEY:
@@ -30,6 +30,7 @@ async def generate_embedding(text:str) -> list[float]:
         )
     
     try:
+
         response = client.models.embed_content(
             model=settings.Embedding_Model,
             contents=text,
@@ -47,11 +48,10 @@ async def generate_embedding(text:str) -> list[float]:
         
         return embedding
     
-    except HTTPException as e:
-        raise e
+    except HTTPException:
+        raise
     
     except Exception as e:
-        raise HTTPException(
-          status_code=500,
-          detail=f"Embedding generation failed: {str(e)}"   
-        ) 
+        raise EmbeddingError(
+            f"Embedding generation failed: {str(e)}"
+        )

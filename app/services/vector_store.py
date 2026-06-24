@@ -6,9 +6,8 @@ from qdrant_client.models import (
 )
 from uuid import uuid4
 from datetime import datetime
-
 from app.config import settings
-
+from app.exceptions import QdrantStorageError
 
 class VectorStore:
 
@@ -71,27 +70,34 @@ class VectorStore:
         temperature: float = 0.7
     ) -> None:
 
-        now = datetime.utcnow().isoformat()
+        try:
 
-        point = PointStruct(
-            id=str(uuid4()),
-            vector=embedding,
-            payload={
-                "prompt": prompt,
-                "response": response,
-                "model": model,
-                "temperature": temperature,
-                "cache_status": cache_status,
-                "created_at": now,
-                "last_accessed_at": now,
-                "cache_hits": 0
-            }
-        )
+            now = datetime.utcnow().isoformat()
 
-        self.client.upsert(
-            collection_name=self.collection_name,
-            points=[point]
-        )
+            point = PointStruct(
+                id=str(uuid4()),
+                vector=embedding,
+                payload={
+                    "prompt": prompt,
+                    "response": response,
+                    "model": model,
+                    "temperature": temperature,
+                    "cache_status": cache_status,
+                    "created_at": now,
+                    "last_accessed_at": now,
+                    "cache_hits": 0
+                }
+            )
+
+            self.client.upsert(
+                collection_name=self.collection_name,
+                points=[point]
+            )
+
+        except Exception as e:
+            raise QdrantStorageError(
+                f"Qdrant storage failed: {str(e)}"
+            )
 
     def update_cache_hit(
         self,
@@ -99,48 +105,66 @@ class VectorStore:
         payload: dict
     ) -> None:
 
-        updated_payload = {
-            **payload,
-            "cache_hits": payload.get(
-                "cache_hits",
-                0
-            ) + 1,
-            "cache_status": "HIT",
-            "last_accessed_at":
-                datetime.utcnow().isoformat()
-        }
+        try:
 
-        self.client.set_payload(
-            collection_name=self.collection_name,
-            payload=updated_payload,
-            points=[point_id]
-        )
+            updated_payload = {
+                **payload,
+                "cache_hits": payload.get(
+                    "cache_hits",
+                    0
+                ) + 1,
+                "cache_status": "HIT",
+                "last_accessed_at":
+                    datetime.utcnow().isoformat()
+            }
+
+            self.client.set_payload(
+                collection_name=self.collection_name,
+                payload=updated_payload,
+                points=[point_id]
+            )
+
+        except Exception as e:
+            raise QdrantStorageError(
+                f"Failed to update cache hit: {str(e)}"
+            )
 
     def search_similar(
         self,
         embedding: list[float],
         limit: int = 1
     ):
+        try:
+            results = self.client.query_points(
+                collection_name=self.collection_name,
+                query=embedding,
+                limit=limit,
+                with_payload=True
+            )
 
-        results = self.client.query_points(
-            collection_name=self.collection_name,
-            query=embedding,
-            limit=limit,
-            with_payload=True
-        )
+            if not results.points:
+                return None
 
-        if not results.points:
-            return None
-
-        return results.points[0]
+            return results.points[0]
+            
+        except Exception as e:
+            raise QdrantSearchError(
+                f"Qdrant search failed: {str(e)}"
+            )
     
     def get_total_cache_items(self) -> int:
-        results = self.client.count(
-            collection_name = self.collection_name,
-            exact=True
-        )
+        try:
+            results = self.client.count(
+                collection_name = self.collection_name,
+                exact=True
+            )
+            return results.count
+        
+        except Exception as e:
 
-        return results.count
+            raise QdrantSearchError(
+                f"Failed to count cache items: {str(e)}"
+            )
     
     def get_collection_info(self):
         return self.client.get_collection(
@@ -151,14 +175,20 @@ class VectorStore:
         self,
         limit: int = 10
     ):
+        try:
+            results, _ = self.client.scroll(
+                collection_name=self.collection_name,
+                limit=limit,
+                with_payload=True,
+                with_vectors=False
+            )
 
-        results, _ = self.client.scroll(
-            collection_name=self.collection_name,
-            limit=limit,
-            with_payload=True,
-            with_vectors=False
-        )
+            return results
+            
+        except Exception as e:
 
-        return results
+            raise QdrantSearchError(
+                f"Failed to get collection info: {str(e)}"
+            )
 
 vectorstore = VectorStore()
