@@ -5,11 +5,9 @@ from app.schemas import GenerateRequest, GenerateResponse
 from app.services.llm_service import generate_llm_response
 from app.services.embedding_service import generate_embedding
 from app.services.vector_store import vectorstore
-from app.services.cache_service import (
-    build_cache_response,
-    store_cache_entry,
-    update_cache_hit
-)
+from app.services.cache_service import build_cache_response, store_cache_entry, update_cache_hit
+from app.services.pii_service import detect_pii
+
 from app.config import settings
 from app.exceptions import (
     EmbeddingError,
@@ -34,6 +32,29 @@ async def generate_response(request: GenerateRequest):
         )
 
     try:
+
+        pii_detected , pii_types = detect_pii(request.prompt)
+
+        if pii_detected:
+            llm_response = await generate_llm_response(
+                prompt = request.prompt,
+                model = request.model,
+            )
+            latency_ms = round((time.time() - start_time) * 1000, 2)
+
+            return GenerateResponse(
+                success=True,
+                response=llm_response,
+                cache_status="SKIPPED_PII",
+                cached=False,
+                similarity_score=None,
+                latency_ms=latency_ms,
+                matched_prompt=None,
+                embedding_generated=True,
+                PII_detected = True,
+                pii_types=pii_types
+            )
+        
         embedding = await generate_embedding(request.prompt)
 
         logger.info("Embedding generated successfully")
@@ -84,7 +105,7 @@ async def generate_response(request: GenerateRequest):
 
         llm_response = await generate_llm_response(
             prompt=request.prompt,
-            model=request.model
+            model=request.model,
         )
 
         store_cache_entry(
