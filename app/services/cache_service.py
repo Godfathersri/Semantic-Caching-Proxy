@@ -10,6 +10,8 @@ def build_cache_response(
     matched_prompt: str | None,
     latency_ms: float,
     embedding_generated: bool,
+    pii_detected: bool = False,
+    pii_types: list[str] | None = None
 ) -> GenerateResponse:
 
     return GenerateResponse(
@@ -24,6 +26,8 @@ def build_cache_response(
 
         latency_ms=latency_ms,
         embedding_generated=embedding_generated,
+        pii_detected=pii_detected,
+        pii_types=pii_types or []
     )
 
 
