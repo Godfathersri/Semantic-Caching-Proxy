@@ -6,3 +6,5 @@ google-genai
 qdrant-client
 pandas
 pydantic-settings
+presidio-analyzer
+spacy

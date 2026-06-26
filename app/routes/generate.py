@@ -39,7 +39,6 @@ async def generate_response(request: GenerateRequest):
             llm_response = await generate_llm_response(
                 prompt = request.prompt,
                 model = request.model,
-                temperature= request.temperature
             )
             latency_ms = round((time.time() - start_time) * 1000, 2)
 
@@ -113,7 +112,6 @@ async def generate_response(request: GenerateRequest):
         llm_response = await generate_llm_response(
             prompt=request.prompt,
             model=request.model,
-            temperature= request.temperature
         )
 
         store_cache_entry(

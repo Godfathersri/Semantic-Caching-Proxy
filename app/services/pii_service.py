@@ -4,8 +4,8 @@ analyser = AnalyzerEngine()
 
 pii_entites_needed = [
   "EMAIL_ADDRESS",
-  "Phone_NUMBER",
-  "Credit_CARD",
+  "PHONE_NUMBER",
+  "CREDIT_CARD",
   "IP_ADDRESS",
   "URL",
   "PERSON"
