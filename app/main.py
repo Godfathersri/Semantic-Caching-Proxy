@@ -5,7 +5,7 @@ from app.routes import (
     generate,
     cache
 )
-
+from app.routes.test_judge import router as test_router
 from app.services.vector_store import (
     vectorstore
 )
@@ -19,6 +19,7 @@ app = FastAPI(
 app.include_router(
     health.router
 )
+app.include_router(test_router)
 
 app.include_router(
     generate.router
