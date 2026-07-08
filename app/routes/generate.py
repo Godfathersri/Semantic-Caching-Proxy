@@ -7,6 +7,7 @@ from app.services.embedding_service import generate_embedding
 from app.services.vector_store import vectorstore
 from app.services.cache_service import build_cache_response, store_cache_entry, update_cache_hit
 from app.services.pii_service import detect_pii
+from app.logger import logger
 
 from app.config import settings
 from app.exceptions import (

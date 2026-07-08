@@ -12,7 +12,10 @@ def build_cache_response(
     latency_ms: float,
     embedding_generated: bool,
     pii_detected: bool = False,
-    pii_types: list[str] | None = None
+    pii_types: list[str] | None = None,
+    judge_used: bool = False,
+    judge_decision: str | None = None,
+    cache_decision_reason: str | None = None   
 ) -> GenerateResponse:
 
     return GenerateResponse(
@@ -28,7 +31,10 @@ def build_cache_response(
         latency_ms=latency_ms,
         embedding_generated=embedding_generated,
         pii_detected=pii_detected,
-        pii_types=pii_types or []
+        pii_types=pii_types or [],
+        judge_used=judge_used,
+        judge_decision=judge_decision,
+        cache_decision_reason=cache_decision_reason
     )
 
 
@@ -57,7 +63,7 @@ def update_cache_hit(
     cache_result
 ) -> None:
 
-     logger.info(f"Updating cache hit | id={cache_result.id}")
+    logger.info(f"Updating cache hit | id={cache_result.id}")
 
     payload = cache_result.payload or {}
 
