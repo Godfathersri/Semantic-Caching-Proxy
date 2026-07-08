@@ -19,10 +19,6 @@ class Settings(BaseSettings):
     QDRANT_DISTANCE: str
     QDRANT_SIMILARITY_THRESHOLD: float
 
-    ENABLE_CACHE_JUDGE: bool
-    QDRANT_HIGH_CONFIDENCE_THRESHOLD: float
-    QDRANT_JUDGE_THRESHOLD: float
-    CACHE_JUDGE_MODEL: str
 
     class Config:
         env_file = ".env"

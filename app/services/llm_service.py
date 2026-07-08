@@ -1,8 +1,19 @@
 from fastapi import HTTPException
 from google import genai
 
+from app.config import settings
 from app.exceptions import GeminiAPIError, GeminiUnavailableError
-from app.services.gemini_client import client
+
+if not settings.GEMINI_API_KEY:
+    raise RuntimeError(
+        "GEMINI_API_KEY is not configured"
+    )
+
+
+client = genai.Client(
+    api_key=settings.GEMINI_API_KEY
+)
+
 
 async def generate_llm_response(
     prompt: str,
