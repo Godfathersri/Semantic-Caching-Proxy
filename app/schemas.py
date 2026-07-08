@@ -62,6 +62,9 @@ class GenerateResponse(BaseModel):
 
     latency_ms: float
     embedding_generated: bool = False
+    judge_used: bool = False
+    judge_decision: Optional[str] = None
+    cache_decision_reason: Optional[str] = None
 
 class ErrorDetail(BaseModel):
     code: str
