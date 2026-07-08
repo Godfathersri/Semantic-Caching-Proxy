@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+from app.routes.test_judge import router as test_router
 from app.routes import (
     health,
     generate,
@@ -18,6 +18,10 @@ app = FastAPI(
 
 app.include_router(
     health.router
+)
+
+app.include_router(
+    test_router
 )
 
 app.include_router(

@@ -3,16 +3,7 @@ from google import genai
 from app.logger import logger
 from app.config import settings
 from app.exceptions import GeminiAPIError, GeminiUnavailableError
-
-if not settings.GEMINI_API_KEY:
-    raise RuntimeError(
-        "GEMINI_API_KEY is not configured"
-    )
-
-
-client = genai.Client(
-    api_key=settings.GEMINI_API_KEY
-)
+from app.services.gemini_client import client
 
 
 async def generate_llm_response(
